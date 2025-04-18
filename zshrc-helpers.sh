@@ -20,13 +20,13 @@ typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
 # ── Smart Composer PHP Version Wrapper ───────────────────────────────
 composer() {
-  # if there’s a composer.json in cwd, pick the right PHP and invoke the real composer
+  # If there’s a composer.json, pick the right PHP and invoke the real composer
   if [[ -f composer.json ]]; then
-    # read the version (e.g. "8.2") from composer.json
+    # Extract PHP version (e.g. "8.2") from composer.json
     local php_version
-    php_version=$(jq -r '.require.php // ""' composer.json |
-      grep -oP '\d+\.\d+' | head -n1)
-    # fall back to the default php if none in composer.json
+    php_version=$(jq -r '.require.php // ""' composer.json | grep -oP '\d+\.\d+' | head -n1)
+    
+    # Determine PHP binary
     local php_bin
     if [[ -n $php_version && -x $(command -v php"$php_version") ]]; then
       php_bin=$(command -v php"$php_version")
@@ -34,16 +34,20 @@ composer() {
       php_bin=$(command -v php)
     fi
 
-    # find the real composer executable
+    # Locate the actual composer executable (ignore this function)
     local comp_bin
-    comp_bin=$(command -v composer)
+    if [[ -n $(whence -p composer 2>/dev/null) ]]; then
+      comp_bin=$(whence -p composer)
+    else
+      comp_bin=$(command -v composer)
+    fi
 
     echo "🚀 Running Composer with PHP ${php_bin##*/}"
     COMPOSER_ALLOW_SUPERUSER=1 "$php_bin" "$comp_bin" "$@"
     return
   fi
 
-  # otherwise just run the system composer
+  # Otherwise just call the system composer directly
   command composer "$@"
 }
 
