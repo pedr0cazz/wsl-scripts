@@ -140,9 +140,13 @@ if ((LAST_DONE < 8)); then
     done_step 8
 fi
 
-# 13) Step 9: Clone helper scripts
+# 13) Step 9: Setup helper scripts
 if ((LAST_DONE < 9)); then
-    run "Clone helper scripts" git clone --depth=1 "$SCRIPTS_REPO" "$SCRIPTS_DIR"
+    if [ ! -d "$SCRIPTS_DIR" ]; then
+        run "Clone helper scripts" git clone --depth=1 "$SCRIPTS_REPO" "$SCRIPTS_DIR"
+    else
+        echo "Helper scripts already exist, skipping clone."
+    fi
     run "Make SSL manager executable" chmod +x "$SCRIPTS_DIR/ssl-manager.sh"
     done_step 9
 fi
