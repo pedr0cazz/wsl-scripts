@@ -14,6 +14,7 @@ if [[ -z "${WEB_ROOT:-}" ]]; then
   echo "ERROR: WEB_ROOT is not set." >&2
   exit 1
 fi
+
 if [[ -z "${SSL_DIR:-}" ]]; then
   echo "ERROR: SSL_DIR is not set." >&2
   exit 1
@@ -26,6 +27,7 @@ CA_CERT="$CA_DIR/rootCA.pem"
 NGINX_SITES_AVAILABLE="/etc/nginx/sites-available"
 NGINX_SITES_ENABLED="/etc/nginx/sites-enabled"
 HOSTS_FILE="/mnt/c/Windows/System32/drivers/etc/hosts"
+WIN_HOSTS_FILE="C:\Windows\System32\drivers\etc\hosts"
 
 CERT_KEY="$SSL_DIR/laragon.test.key"
 CERT_CRT="$SSL_DIR/laragon.test.crt"
@@ -48,7 +50,7 @@ else
 fi
 
 echo "🔧 Building SAN config..."
-cat > "$CERT_CNF" <<EOF
+cat >"$CERT_CNF" <<EOF
 [ v3_req ]
 subjectAltName = @alt_names
 
@@ -57,9 +59,9 @@ DNS.1 = *.test
 EOF
 
 i=2
-for dir in "$WEB_ROOT"/*/; do
-  site=$(basename "$dir")
-  echo "DNS.$i = ${site}.test" >> "$CERT_CNF"
+for dirpath in "$WEB_ROOT"/*/; do
+  site=$(basename "${dirpath%/}")
+  echo "DNS.$i = ${site}.test" >>"$CERT_CNF"
   ((i++))
 done
 
@@ -73,24 +75,31 @@ openssl x509 -req -in "$CERT_CSR" -CA "$CA_CERT" -CAkey "$CA_KEY" \
   -CAcreateserial -out "$CERT_CRT" -days 825 -sha256 \
   -extfile "$CERT_CNF" -extensions v3_req
 
-cat "$CERT_CRT" "$CA_CERT" > "$CERT_BUNDLE"
+cat "$CERT_CRT" "$CA_CERT" >"$CERT_BUNDLE"
 
 echo "🌐 Generating NGINX vhosts..."
-for dir in "$WEB_ROOT"/*/; do
-  [[ ! -d "$dir" ]] && continue
+for rawdir in "$WEB_ROOT"/*/; do
+  [[ ! -d "$rawdir" ]] && continue
+  dir="${rawdir%/}"
   site=$(basename "$dir")
   domain="$site.test"
+
+  # Determine document root
   if [[ -f "$dir/public/index.php" ]]; then
     root_path="$dir/public"
   else
     root_path="$dir"
   fi
+
+  # Detect PHP version
   composer_file="$dir/composer.json"
-  php_ver=$(jq -r '.require.php // empty' "$composer_file" 2>/dev/null | grep -o "[0-9]\+\.[0-9]\+" | head -n1)
+  php_ver=$(jq -r '.require.php // empty' "$composer_file" 2>/dev/null |
+    grep -o "[0-9]\+\.[0-9]\+" | head -n1)
   php_ver=${php_ver:-8.2}
   php_socket="php${php_ver}-fpm.sock"
 
-  sudo tee "$NGINX_SITES_AVAILABLE/$domain" > /dev/null <<NGINX
+  # Write vhost, expand Bash vars; escape Nginx vars
+  sudo tee "$NGINX_SITES_AVAILABLE/$domain" >/dev/null <<NGINX
 server {
     listen 80;
     server_name $domain;
@@ -113,46 +122,66 @@ server {
 
     location ~ \.php\$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/run/php/\$php_socket;
+        fastcgi_pass unix:/run/php/$php_socket;
     }
 
-    location ~ /\\.ht {
+    location ~ /\.ht {
         deny all;
     }
 }
 NGINX
-  sudo ln -sf "$NGINX_SITES_AVAILABLE/$domain" "$NGINX_SITES_ENABLED/$domain"
-  grep -q "$domain" "$HOSTS_FILE" || echo "127.0.0.1 $domain" | sudo tee -a "$HOSTS_FILE"
-done
 
-echo "🧹 Cleaning up old vhosts..."
-for conf in "$NGINX_SITES_AVAILABLE"/*.test; do
-  domain=$(basename "$conf")
-  site=${domain%.test}
-  if [[ ! -d "$WEB_ROOT/$site" ]]; then
-    echo "🗑️ Removing $domain"
-    sudo rm -f "$NGINX_SITES_AVAILABLE/$domain" "$NGINX_SITES_ENABLED/$domain"
-    sudo sed -i "/$domain/d" "$HOSTS_FILE"
+   # Enable site
+  sudo ln -sf "$NGINX_SITES_AVAILABLE/$domain" "$NGINX_SITES_ENABLED/$domain"
+  entry="127.0.0.1 $domain"
+  if ! grep -Fxq "$entry" "$HOSTS_FILE"; then
+    if echo "$entry" | sudo tee -a "$HOSTS_FILE" >/dev/null; then
+      echo "Added $domain to $HOSTS_FILE"
+    else
+      echo "⚠️ Unable to modify Windows hosts file directly."
+      echo "Launching Notepad as Admin (or open WSL in admin mode to modify $HOSTS_FILE):"
+      powershell.exe -Command "Start-Process notepad.exe -ArgumentList '$WIN_HOSTS_FILE' -Verb runAs"
+      echo "Please add the line manually, then save and close Notepad."
+    fi
   fi
 done
 
-# 8) Fix permissions
+if sudo test -w "$HOSTS_FILE"; then
+  echo "🧹 Cleaning up old vhosts..."
+  for conf in "$NGINX_SITES_AVAILABLE"/*.test; do
+    domain=$(basename "$conf")
+    site=${domain%.test}
+    if [[ ! -d "$WEB_ROOT/$site" ]]; then
+      echo "🗑️ Removing $domain"
+      sudo rm -f "$NGINX_SITES_AVAILABLE/$domain" "$NGINX_SITES_ENABLED/$domain"
+      sudo sed -i "/$domain/d" "$HOSTS_FILE" && \
+          echo "Removed $domain from $HOSTS_FILE"
+    fi
+  done
+else
+  echo "⚠️ Skipping cleanup of old vhosts due to inability to modify $HOSTS_FILE"
+fi
+
+# Fix permissions
 USER_NAME=$(whoami)
 sudo chown -R "$USER_NAME":www-data "$WEB_ROOT"
 sudo find "$WEB_ROOT" -type d -exec chmod 750 {} \;
 sudo find "$WEB_ROOT" -type f -exec chmod 640 {} \;
+for appdir in "$WEB_ROOT"/*; do
+  if [[ -d "$appdir/storage" ]]; then
+    echo "⚙️ Setting permissions for Laravel storage and cache in $(basename "$appdir")"
+    sudo chown -R "$USER_NAME":www-data "$appdir/storage" "$appdir/bootstrap/cache"
+    sudo chmod -R 775 "$appdir/storage" "$appdir/bootstrap/cache"
+  fi
+done
 sudo chmod o+x "$HOME" "$WEB_ROOT"
-if ! groups "$USER_NAME" | grep -q '\bwww-data\b'; then
-  sudo usermod -a -G www-data "$USER_NAME"
-fi
 
-# 9) Reload NGINX
+# Reload Nginx
 if systemctl is-active --quiet nginx; then
   sudo systemctl reload nginx
 else
   sudo systemctl start nginx
 fi
-
 
 echo "🎉 SSL Manager complete."
 echo "Please restart your terminal or run 'source ~/.zshrc' to apply changes."
