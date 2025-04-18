@@ -86,40 +86,6 @@ Powerlevel10k requires special glyphs:
 
 ---
 
-## 🔧 Prerequisites
-
-Before running the installer, complete these setup steps:
-
-### ⚙️ Configure Git
-
-Set your global Git username and email for commits:
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "you@example.com"
-```
-
-### 🚚 Import Laragon Projects
-
-If you have existing projects in Laragon, you can copy them into your WSL project root (`$HOME/www` by default or your chosen `$WEB_ROOT`):
-```bash
-cp -r /mnt/c/laragon/www/* ~/www/
-# or, if you set a custom path:
-cp -r /mnt/c/laragon/www/* "$WEB_ROOT/"
-```
-
-### 🔑 SSH Keys
-
-To use your existing SSH keys from Windows:
-```bash
-mkdir -p ~/.ssh
-cp /mnt/c/Users/<WindowsUser>/.ssh/id_rsa* ~/.ssh/
-chmod 600 ~/.ssh/id_rsa
-chmod 644 ~/.ssh/id_rsa.pub
-ssh-add ~/.ssh/id_rsa
-```
-
----
-
 ## ⚡️🚀 Quick Start
 
 ```bash
@@ -208,6 +174,42 @@ MIT © [pedr0cazz](https://github.com/pedr0cazz)
 - **Powerlevel10k** Zsh theme
 - **Ubuntu**, **Nginx**, **MySQL**, **Redis**, **PHP**, **Node.js**, **Composer**, **Oh My Zsh**
 - Open‑source community for the tools we automate
+
+---
+
+## 🔧 Prerequisites
+
+Before running the installer, complete these setup steps:
+
+### ⚙️ Configure Git
+
+Set your global Git username and email for commits:
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+```
+
+### 🚚 Import Laragon Projects
+
+If you have existing projects in Laragon, you can copy them into your WSL project root (`$HOME/www` by default or your chosen `$WEB_ROOT`):
+```bash
+cp -r /mnt/c/laragon/www/* ~/www/
+# or, if you set a custom path:
+cp -r /mnt/c/laragon/www/* "$WEB_ROOT/"
+```
+
+### 🔑 SSH Keys
+
+To use your existing SSH keys from Windows:
+```bash
+mkdir -p ~/.ssh
+cp /mnt/c/Users/<WindowsUser>/.ssh/id_rsa* ~/.ssh/
+chmod 600 ~/.ssh/id_rsa
+chmod 644 ~/.ssh/id_rsa.pub
+ssh-add ~/.ssh/id_rsa
+```
+
+---
 
 Happy Coding! 🚀
 
