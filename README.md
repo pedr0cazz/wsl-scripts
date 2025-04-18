@@ -153,9 +153,12 @@ No shell restart needed.
    cd "$WEB_ROOT"
    laravel new blog
 
-  
+   
    ```
-2. Open a new shell to auto-generate:
+2. Open a new shell to auto-generate OR manually run the SSL manager:
+   ```bash
+   ~/.wsl_scripts/ssl-manager.sh
+   ```
    - Nginx vhost `blog.test`
    - Self-signed SSL cert trusted by your Windows host
 3. Access your site securely:
