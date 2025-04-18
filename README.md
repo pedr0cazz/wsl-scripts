@@ -153,8 +153,7 @@ No shell restart needed.
    cd "$WEB_ROOT"
    laravel new blog
 
-   cd "$WEB_ROOT"
-   composer create-project laravel/laravel blog
+  
    ```
 2. Open a new shell to auto-generate:
    - Nginx vhost `blog.test`
