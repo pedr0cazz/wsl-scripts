@@ -55,19 +55,41 @@ export SCRIPTS_DIR="$SCRIPTS_DIR"
 export SSL_SCRIPT="\$SCRIPTS_DIR/ssl-manager.sh"
 EOF
 
-# 4) Quiet runner: captures stderr, silences stdout
+# 4) Quiet runner: captures stderr, silences stdout, and displays a loading bar
 run() {
     local msg="$1"
     shift
-    printf "→ %s... " "$msg"
-    local output status
-    output=$({ "$@" 1>/dev/null; } 2>&1) || status=$?
-    if [[ -n "${status:-}" && ${status} -ne 0 ]]; then
-        echo "✖"
+    local tmp_log
+    tmp_log=$(mktemp)
+    # Initial print with empty progress bar (20 slots)
+    printf "→ %s... [%-20s] 0%%" "$msg" ""
+    "$@" 1>/dev/null 2>"$tmp_log" &
+    local pid=$!
+    local percent=0
+    while kill -0 "$pid" 2>/dev/null; do
+        percent=$(( percent + 5 ))
+        if (( percent > 90 )); then
+            percent=90
+        fi
+        local num_bars=$(( percent / 5 ))
+        local bars
+        bars=$(printf '%0.s=' $(seq 1 $num_bars))
+        local spaces
+        spaces=$(printf '%0.s ' $(seq 1 $(( 20 - num_bars ))))
+        printf "\r→ %s... [%-20s] %d%%" "$msg" "$bars$spaces" "$percent"
+        sleep 0.2
+    done
+    wait "$pid"
+    local status=$?
+    local output
+    output=$(cat "$tmp_log")
+    rm -f "$tmp_log"
+    if [ $status -eq 0 ]; then
+        printf "\r→ %s... [====================] 100%%\n" "$msg"
+    else
+        printf "\r→ %s... [====================] FAILED\n" "$msg"
         echo "${output}"
         exit "$status"
-    else
-        echo "✔"
     fi
 }
 
@@ -112,10 +134,17 @@ if ((LAST_DONE < 5)); then
     #   # Source powerlevel10k config if p10k created
     #   run "Source p10k config" bash -c 'grep -q "source ~/.p10k.zsh" ~/.zshrc || echo "[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh" >> ~/.zshrc'
     # Add Composer global bin to PATH
-    run "Add composer to PATH" bash -c 'grep -q "composer/vendor/bin" ~/.zshrc || echo "export PATH=\"$HOME/.config/composer/vendor/bin:$PATH\"" >> ~/.zshrc'
-    # Source our env and helpers
-    run "Source env file" bash -c 'grep -q "source ~/.wsl_env" ~/.zshrc || echo "source ~/.wsl_env" >> ~/.zshrc'
-    run "Source zshrc helpers" bash -c 'grep -q "zshrc-helpers.sh" ~/.zshrc || echo "source \"$SCRIPTS_DIR/zshrc-helpers.sh\"" >> ~/.zshrc'
+    # Add Composer global binaries to PATH (literal, no expansion now)
+    echo 'Add Composer global binaries to PATH'
+    grep -q 'export PATH="$HOME/.config/composer/vendor/bin:$PATH"' ~/.zshrc ||
+        echo 'export PATH="$HOME/.config/composer/vendor/bin:$PATH"' >>~/.zshrc
+
+    # Add smart Composer PHP version wrapper
+    echo 'Add smart Composer PHP version wrapper'
+    # Source environment variables
+    grep -q 'source ~/.wsl_env' ~/.zshrc || echo 'source ~/.ws_env' >>~/.zshrc
+    # Append full helpers content from zshrc-helpers.sh (variables loaded via ~/.wsl_env)
+    grep -q '# ── Laragon SSL Manager Check' ~/.zshrc || cat "$SCRIPTS_DIR/zshrc-helpers.sh" >>~/.zshrc
     done_step 5
 fi
 
