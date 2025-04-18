@@ -35,7 +35,7 @@ Welcome to **wsl‑scripts**, a collection of helper scripts designed to streaml
 Choose a directory for your helper scripts (we recommend `~/.wsl_scripts`):
 
 ```bash
-git clone git@github.com:pedr0cazz/wsl-scripts.git ~/.wsl_scripts
+git clone https://github.com/pedr0cazz/wsl-scripts.git ~/.wsl_scripts
 chmod +x ~/.wsl_scripts/*.sh
 ```
 
