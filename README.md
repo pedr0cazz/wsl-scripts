@@ -152,7 +152,7 @@ No shell restart needed.
    # Scaffold a new project named "blog"
    cd "$WEB_ROOT"
    laravel new blog
-   ```bash
+
    cd "$WEB_ROOT"
    composer create-project laravel/laravel blog
    ```
