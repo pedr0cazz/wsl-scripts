@@ -1,6 +1,6 @@
 # 🎉 WSL Web‑Dev Environment Scripts
 
-![WSL Web-Dev Environment](https://raw.githubusercontent.com/pedr0cazz/wsl-scripts/main/.github/assets/wsl-web-dev.png)
+🐧⭐️
 ![GitHub](https://img.shields.io/github/license/pedr0cazz/wsl-scripts?style=flat-square)
 ![GitHub repo size](https://img.shields.io/github/repo-size/pedr0cazz/wsl-scripts?style=flat-square)
 ![GitHub last commit](https://img.shields.io/github/last-commit/pedr0cazz/wsl-scripts?style=flat-square)
@@ -11,6 +11,9 @@
 ![GitHub forks](https://img.shields.io/github/forks/pedr0cazz/wsl-scripts?style=social)
 ![GitHub watchers](https://img.shields.io/github/watchers/pedr0cazz/wsl-scripts?style=social)
 ![GitHub followers](https://img.shields.io/github/followers/pedr0cazz?style=social)
+
+
+
 **Tired of manual setup?** This toolkit turns a fresh WSL 2 Ubuntu into a powerhouse web‑dev environment in one go.
 
 ---
