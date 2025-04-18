@@ -9,7 +9,7 @@
 ![Stars](https://img.shields.io/github/stars/pedr0cazz/wsl-scripts?style=social)
 ![Forks](https://img.shields.io/github/forks/pedr0cazz/wsl-scripts?style=social)
 
-Transform your fresh WSL 2 Ubuntu into a **powerful web‑development environment** in minutes!
+Transform a clean WSL 2 Ubuntu install into a **full-featured, secure web‑development environment** in just minutes. Whether you’re building PHP, Node, or static sites, these scripts handle installation, configuration, and SSL for you—so you can focus on coding.
 
 ---
 
@@ -37,53 +37,56 @@ Transform your fresh WSL 2 Ubuntu into a **powerful web‑development environme
 
 ## 📝 Overview
 
-**wsl‑scripts** automates setting up a complete web‑dev stack on WSL 2:
+This repository provides a set of Bash scripts to automate every step of provisioning a web‑development environment on Windows 10/11 via WSL 2:
 
-- 🛠️ **Core tooling**: Nginx, MySQL, Redis, PHP 8.x, Node LTS, Composer
-- 🌈 **Fancy shell**: Zsh with Oh My Zsh, Powerlevel10k, autosuggestions, syntax highlighting
-- 🔐 **Local SSL**: `*.test` certificates, Nginx vhosts, and automatic Windows hosts-file updates
-- 💡 **Helpers**: PHP version selection for Composer, ssh-agent auto-start, SSL renewal
+- **Core services**: Nginx with HTTP/2, MySQL (MariaDB fallback), Redis for caching, and Node LTS for JavaScript workloads.
+- **PHP ecosystem**: Parallel PHP 8.2, 8.3, and 8.4 installations, PHP-FPM pools, Composer installer, and an intelligent wrapper to pick the right PHP version per project.
+- **Developer tooling**: Zsh with Oh My Zsh, Powerlevel10k theme, autosuggestions, and syntax highlighting for a blazing-fast shell experience.
+- **HTTPS everywhere**: Locally‑trusted `*.test` SSL certificates, automated Nginx virtual host generation, and hosts file updates on Windows.
+- **Resilience**: Quiet, resumable installer with progress bars and state checkpoints—won’t leave your system half‑configured.
 
-Everything runs **quietly**, shows a **progress bar**, and can **resume** if interrupted.
+With these scripts, setting up a fresh WSL 2 instance becomes a single-command task, saving hours of manual work.
 
 ---
 
 ## 🛠️ Installation
 
+### 🚧 Prerequisites
+
+1. **Windows Version**: Windows 10 (2004+) or Windows 11 with WSL 2 support.
+2. **Virtualization**: Enabled in BIOS/UEFI.
+3. **Admin Rights**: Required for enabling features and updating hosts file.
+
 ### 🚧 Always Run as Administrator
 
-> 🚨 **IMPORTANT:** Always launch **Windows Terminal** (or PowerShell) as **Administrator**.
-> Create a shortcut to `wt.exe` and enable **Run as administrator** in its properties.
+> **Note:** Many steps require elevated privileges. Launch **Windows Terminal** or **PowerShell** as Administrator to avoid permission errors.
 
 ### 🖥️ Installing WSL 2
 
-1. Open PowerShell as Administrator and run:
-
+1. Open an elevated PowerShell and enable required features:
    ```powershell
    dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
    dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
    ```
-
-2. Reboot your PC.
-3. Install the Linux kernel update: https://aka.ms/wsl2kernel
-4. Set WSL 2 as default:
-
+2. Reboot your machine.
+3. Install the WSL 2 Linux kernel from Microsoft:
+   - Download from: https://aka.ms/wsl2kernel
+4. Set your default distro version to WSL 2:
    ```powershell
    wsl --set-default-version 2
    ```
-
-5. Install a distro (e.g., Ubuntu 22.04 LTS) from the Microsoft Store.
-6. Launch your WSL distro once via the Admin shortcut.
+5. Install Ubuntu 22.04 LTS (or another supported distro) from the Microsoft Store.
+6. Launch the distro once (via your Admin Terminal) to finalize installation.
 
 ### 🎨 MesloLGS Nerd Font
 
-Powerlevel10k requires special glyphs:
+**Why?** Powerlevel10k uses special glyphs for icons and powerline symbols.
 
-1. Download the four MesloLGS NF fonts (Regular, Bold, Italic, Bold Italic) from the [powerlevel10k-media repo](https://github.com/romkatv/powerlevel10k-media).
-2. Install each via right-click → **Install for all users**.
-3. Configure your terminal font to **MesloLGS NF**.
+1. Download the four MesloLGS NF font files (Regular, Bold, Italic, Bold Italic) from:
+   https://github.com/romkatv/powerlevel10k-media
+2. Install each font by right-click → **Install for all users**.
+3. In Windows Terminal settings, set the font face to **MesloLGS NF**.
 4. Verify inside WSL:
-
    ```bash
    ls /mnt/c/Windows/Fonts | grep 'MesloLGS NF'
    ```
@@ -92,20 +95,23 @@ Powerlevel10k requires special glyphs:
 
 ## ⚡️ Quick Start
 
-```bash
-# 1. Clone the scripts
-git clone https://github.com/pedr0cazz/wsl-scripts.git ~/.wsl_scripts
-chmod +x ~/.wsl_scripts/*.sh
+1. **Clone the repo and make scripts executable**
+   ```bash
+   git clone https://github.com/pedr0cazz/wsl-scripts.git ~/.wsl_scripts
+   chmod +x ~/.wsl_scripts/*.sh
+   ```
+2. **Run the installer**
+   ```bash
+   ~/.wsl_scripts/wsl-setup.sh
+   ```
+   - The script will prompt for your project root (`~/www` by default), SSL directory (`~/ssl`), and helper-scripts path.
+   - Progress indicators and automatic rollback on errors ensure a reliable run.
+3. **Open a new shell or reload Zsh**
+   ```bash
+   source ~/.zshrc
+   ```
 
-# 2. Run the installer
-~/.wsl_scripts/wsl-setup.sh
-
-# 3. Reload your shell
-source ~/.zshrc
-```
-
-> ✨ After installation, your Zsh theme, SSL certificates, Nginx vhosts, and helpers are all configured.
-> 💡 The SSL & vhosts manager runs automatically on each new shell.
+> **Result:** You now have Nginx, PHP-FPM, MySQL, Redis, Node, and Composer configured, plus a fancy Zsh prompt ready to go.
 
 ---
 
@@ -113,38 +119,43 @@ source ~/.zshrc
 
 ### ➕➖ Add or Remove Projects
 
-- **Root:** Projects live in `$WEB_ROOT` (default `~/www`).
-- **Add:**
+- **Project root**: Defined during installation (`$WEB_ROOT`, default `~/www`).
+- **Add a project**: Create a directory under your root. Example:
   ```bash
-  mkdir -p "$WEB_ROOT/myapp"
+  mkdir -p "$WEB_ROOT/my-app"
   ```
-  On next shell launch, SSL & vhost for `myapp.test` is generated.
-- **Remove:**
+  On your next new shell (or manual run of `ssl-manager.sh`), a vhost `my-app.test` and SSL cert will be generated.
+- **Remove a project**: Delete the directory:
   ```bash
-  rm -rf "$WEB_ROOT/myapp"
+  rm -rf "$WEB_ROOT/my-app"
   ```
-  Vhost and hosts entry are cleaned up automatically.
+  The script will detect the missing folder and clean up its Nginx configuration and Windows hosts entry.
 
 ### 🔄 Regenerate SSL & vhosts
 
+Run the SSL manager at any time to sync your project directories with Nginx configs and certificates:
 ```bash
 ~/.wsl_scripts/ssl-manager.sh
 ```
+No shell restart needed.
 
 ### 📚 Laravel Project Example
 
-1. Create a new Laravel app under your project root:
-
+1. Create a Laravel app in the root:
    ```bash
    cd "$WEB_ROOT"
    composer create-project laravel/laravel blog
    ```
-
-2. Open a new shell to auto-generate the `blog.test` vhost and certificates.
-3. Visit: https://blog.test
-4. If needed, set folder permissions:
-
+2. Open a new shell to auto-generate:
+   - Nginx vhost `blog.test`
+   - Self-signed SSL cert trusted by your Windows host
+3. Access your site securely:
+   ```url
+   https://blog.test
+   ```
+4. If permissions issues arise, set correct ownership and mode:
    ```bash
+   sudo chown -R "$USER":"$USER" blog
    chmod -R 775 blog/storage blog/bootstrap/cache
    ```
 
@@ -152,14 +163,14 @@ source ~/.zshrc
 
 ## 🔒 Trusting SSL Certificates
 
-1. Copy your root CA to Windows (Desktop):
+By default, the installer creates a custom CA and issues `*.test` certificates.
 
+1. Copy the root CA certificate to Windows:
    ```bash
-   cp "$SSL_DIR/ca/rootCA.pem" /mnt/c/Users/<User>/Desktop/
+   cp "$SSL_DIR/ca/rootCA.pem" /mnt/c/Users/<YourWindowsUser>/Desktop/
    ```
-
-2. Double-click `rootCA.pem` → **Install Certificate** → Local Machine → **Trusted Root Certification Authorities** → Finish.
-3. Restart your browser and access your `.test` sites securely.
+2. On Windows, double-click `rootCA.pem` → **Install Certificate** → **Local Machine** → **Trusted Root Certification Authorities** → Finish.
+3. Restart your browser, then visit any `*.test` domain without security warnings.
 
 ---
 
@@ -167,56 +178,60 @@ source ~/.zshrc
 
 ### ⚙️ Configure Git
 
-Set your global Git username and email:
-
+Set your name and email for commits:
 ```bash
+# Replace with your identity
 git config --global user.name "Your Name"
 git config --global user.email "you@example.com"
 ```
 
 ### 🚚 Import Laragon Projects
 
-Copy existing Laragon projects into your WSL project root:
-
+Already have projects in Laragon? Copy them into WSL:
 ```bash
 cp -r /mnt/c/laragon/www/* "$WEB_ROOT/"
-```
+``` 
+Then run `ssl-manager.sh` to auto-generate vhosts and certs.
 
 ### 🔑 SSH Keys
 
-Use your Windows SSH keys in WSL:
-
+Reuse existing Windows SSH keys:
 ```bash
 mkdir -p ~/.ssh
-cp /mnt/c/Users/<WindowsUser>/.ssh/id_rsa* ~/.ssh/
+cp /mnt/c/Users/<YourWindowsUser>/.ssh/id_rsa* ~/.ssh/
 chmod 600 ~/.ssh/id_rsa
 chmod 644 ~/.ssh/id_rsa.pub
 ssh-add ~/.ssh/id_rsa
 ```
+This enables passwordless Git over SSH inside WSL.
 
 ---
 
 ## 🤝 Contributing
 
-Feel free to open issues or PRs! To update your local clone:
+Contributions, issues, and feature requests are welcome!
 
-```bash
-git -C ~/.wsl_scripts pull
-```
+1. Fork the repo.
+2. Create a feature branch (`git checkout -b feature-name`).
+3. Commit your changes (`git commit -m 'Add new feature'`).
+4. Push to the branch (`git push origin feature-name`).
+5. Open a Pull Request.
+
+Please follow the [Contributor Covenant](https://www.contributor-covenant.org/) guidelines.
 
 ---
 
 ## ⚖️ License
 
-MIT © [pedr0cazz](https://github.com/pedr0cazz)
+This project is licensed under the **MIT License**. See [LICENSE](https://github.com/pedr0cazz/wsl-scripts/blob/main/LICENSE) for details.
 
 ---
 
 ## 🙏 Acknowledgments
 
-- **Powerlevel10k** theme
-- **Ubuntu**, **Nginx**, **MySQL**, **Redis**, **PHP**, **Node.js**, **Composer**, **Oh My Zsh**
-- Open‑source community for all the tools
+- **Powerlevel10k** for the Zsh theme
+- **Ubuntu**, **Nginx**, **MySQL**, **Redis**, **PHP**, **Node.js**, **Composer**, **Oh My Zsh** for the underlying technologies
+- Open‑source community contributors and maintainers
 
-Happy Coding! 🚀
+Happy coding—and enjoy your new WSL 2 web‑dev environment! 🚀
 
