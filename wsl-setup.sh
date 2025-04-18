@@ -47,7 +47,8 @@ EOF
 run(){ local msg="$1"; shift; printf "→ %s... " "$msg"; if ! "$@" >/dev/null 2>&1; then echo "✖"; exit 1; else echo "✔"; fi }
 
 echo
-# Step 1: Create project root\if (( LAST_DONE < 1 )); then
+# Step 1: Create project root
+if (( LAST_DONE < 1 )); then
   run "Create project root at $WEB_ROOT" mkdir -p "$WEB_ROOT"
   done_step 1
 fi
