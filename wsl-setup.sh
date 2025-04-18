@@ -136,7 +136,7 @@ fi
 
 # 12) Step 8: Secure MySQL root
 if ((LAST_DONE < 8)); then
-    run "Secure MySQL root" bash -c 'sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY ''; FLUSH PRIVILEGES;"'
+    run "Secure MySQL root" bash -c "sudo mysql -e \"ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY ''; FLUSH PRIVILEGES;\""
     done_step 8
 fi
 
