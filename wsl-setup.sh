@@ -94,7 +94,7 @@ if (( LAST_DONE < 4 )); then
   run "Clone zsh-autosuggestions" git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
   run "Clone zsh-syntax-highlighting" git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
   run "Clone powerlevel10k theme" git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k"
-  run "Set default shell to zsh" chsh -s "$(which zsh)"
+  # We avoid interactive chsh; instead we'll auto-launch zsh at the end via bashrc
   done_step 4
 fi
 
@@ -147,7 +147,13 @@ fi
 
 # 15) Final: completion message
 if (( LAST_DONE < 11 )); then
-  echo; echo "🎉 All steps complete! Please restart your terminal or run 'source ~/.zshrc'"
+  echo
+  echo "🎉 All steps complete! Please restart your terminal or run 'source ~/.zshrc'"
+  # Ensure new shells auto-launch zsh
+  if ! grep -q 'exec zsh -l' ~/.bashrc; then
+    echo 'exec zsh -l' >> ~/.bashrc
+  fi
+  # Start zsh right now
+  exec zsh -l
   done_step 11
 fi
-    
