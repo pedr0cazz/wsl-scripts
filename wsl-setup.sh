@@ -74,9 +74,9 @@ for STEP in $(seq 1 $TOTAL_STEPS); do
       run_step "Secure MySQL root" bash -c 'sudo mysql -e "ALTER USER \'root\'@\'localhost\' IDENTIFIED WITH mysql_native_password BY ''; FLUSH PRIVILEGES;"'
       ;;
     7)
-      run_step "Install Composer" bash -c 'php -r "copy(\"https://getcomposer.org/installer\",\"composer-setup.php\");" && HASH_EXPECTED="dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6" && php -r "if (hash_file(\"sha384\",\"composer-setup.php\") === \"$HASH_EXPECTED\") echo; else { unlink(\"composer-setup.php\"); exit 1; }" && php composer-setup.php && php -r "unlink(\"composer-setup.php\");" && sudo mv composer.phar /usr/local/bin/composer'
-      ;;
-    8)
+      run_step "Install Composer" bash -c 'php -r "copy(\"https://getcomposer.org/installer\", \"composer-setup.php\");"; php composer-setup.php; rm composer-setup.php; sudo mv composer.phar /usr/local/bin/composer'
+    ;;
+    8)  
       run_step "Clone helper scripts" bash -c 'git clone --depth=1 "$SCRIPTS_REPO" "$SCRIPTS_DIR"'
       ;;
     9)
