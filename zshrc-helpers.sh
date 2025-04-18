@@ -15,6 +15,8 @@ fi
 
 # ── Add Composer Global Binaries to PATH ─────────────────────────────
 export PATH="$HOME/.config/composer/vendor/bin:$PATH"
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+
 
 # ── Smart Composer PHP Version Wrapper ───────────────────────────────
 composer() {
