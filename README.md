@@ -175,14 +175,21 @@ No shell restart needed.
 
 ## 🔒 Trusting SSL Certificates
 
-By default, the installer creates a custom CA and issues `*.test` certificates.
 
-1. Copy the root CA certificate to Windows:
+By default the installer generates a **custom CA** and issues all `*.test` certs.
+
+1. Copy the root CA to Windows and rename to `.crt`:
    ```bash
-   cp "$SSL_DIR/ca/rootCA.pem" /mnt/c/Users/<YourWindowsUser>/Desktop/
+   cp ~/ssl/ca/rootCA.pem /mnt/c/Users/<YourUser>/Desktop/rootCA.crt
    ```
-2. On Windows, double-click `rootCA.pem` → **Install Certificate** → **Local Machine** → **Trusted Root Certification Authorities** → Finish.
-3. Restart your browser, then visit any `*.test` domain without security warnings.
+2. On Windows **double-click** `rootCA.crt` → **Install Certificate**.
+3. In the **Certificate Import Wizard**:
+   - Choose **Local Machine**
+   - Select **Place all certificates in the following store** → **Browse** → **Trusted Root Certification Authorities**
+   - Click **Next** → **Finish**.
+4. Restart your browser.
+
+Now **any** `*.test` site issued by your CA will load without warnings.
 
 ---
 
