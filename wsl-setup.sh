@@ -131,13 +131,7 @@ if ((LAST_DONE < 5)); then
     sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' ~/.zshrc || true
     # Add plugins if missing
     run "Add Zsh plugins" bash -c 'grep -q "plugins=(git zsh-autosuggestions zsh-syntax-highlighting" ~/.zshrc || sed -i "s/^plugins=(/plugins=(git zsh-autosuggestions zsh-syntax-highlighting /" ~/.zshrc'
-    #   # Source powerlevel10k config if p10k created
-    #   run "Source p10k config" bash -c 'grep -q "source ~/.p10k.zsh" ~/.zshrc || echo "[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh" >> ~/.zshrc'
-    # Add Composer global bin to PATH
-    # Add Composer global binaries to PATH (literal, no expansion now)
-    echo 'Add Composer global binaries to PATH'
-    grep -q 'export PATH="$HOME/.config/composer/vendor/bin:$PATH"' ~/.zshrc ||
-        echo 'export PATH="$HOME/.config/composer/vendor/bin:$PATH"' >>~/.zshrc
+
 
     # Add smart Composer PHP version wrapper
     echo 'Add smart Composer PHP version wrapper'
