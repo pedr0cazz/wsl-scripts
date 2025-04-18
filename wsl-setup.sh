@@ -1,6 +1,3 @@
-# Source user configuration
-source ~/.wsl_env
-
 #!/usr/bin/env bash
 set -euo pipefail
 
