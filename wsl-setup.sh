@@ -142,9 +142,11 @@ if ((LAST_DONE < 5)); then
     # Add smart Composer PHP version wrapper
     echo 'Add smart Composer PHP version wrapper'
     # Source environment variables
-    grep -q 'source ~/.wsl_env' ~/.zshrc || echo 'source ~/.ws_env' >>~/.zshrc
+    grep -q 'source ~/.wsl_env' ~/.zshrc || echo 'source ~/.wsl_env' >>~/.zshrc
     # Append full helpers content from zshrc-helpers.sh (variables loaded via ~/.wsl_env)
     grep -q '# ── Laragon SSL Manager Check' ~/.zshrc || cat "$SCRIPTS_DIR/zshrc-helpers.sh" >>~/.zshrc
+    # add typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
+    grep -q 'typeset -g POWERLEVEL9K_INSTANT_PROMPT=off' ~/.zshrc || echo 'typeset -g POWERLEVEL9K_INSTANT_PROMPT=off' >>~/.zshrc
     done_step 5
 fi
 

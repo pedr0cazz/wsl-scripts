@@ -1,9 +1,25 @@
 #!/bin/bash
 set -euo pipefail
 
-# === CONFIG ===
-WEB_ROOT="${WEB_ROOT:-~/www}"
-SSL_DIR="${SSL_DIR:-~/ssl}"
+# Source user configuration (must define WEB_ROOT and SSL_DIR)
+if [[ -f "$HOME/.wsl_env" ]]; then
+  source "$HOME/.wsl_env"
+else
+  echo "ERROR: ~/.wsl_env not found. Please run the setup installer first." >&2
+  exit 1
+fi
+
+# Validate variables
+if [[ -z "${WEB_ROOT:-}" ]]; then
+  echo "ERROR: WEB_ROOT is not set." >&2
+  exit 1
+fi
+if [[ -z "${SSL_DIR:-}" ]]; then
+  echo "ERROR: SSL_DIR is not set." >&2
+  exit 1
+fi
+
+# Paths
 CA_DIR="$SSL_DIR/ca"
 CA_KEY="$CA_DIR/rootCA.key"
 CA_CERT="$CA_DIR/rootCA.pem"
@@ -17,6 +33,7 @@ CERT_CSR="$SSL_DIR/laragon.test.csr"
 CERT_CNF="$SSL_DIR/laragon.test.cnf"
 CERT_BUNDLE="$SSL_DIR/laragon-bundle.crt"
 
+# Ensure directories
 mkdir -p "$SSL_DIR" "$CA_DIR"
 
 echo "🔐 Creating or reusing Root CA..."
@@ -96,7 +113,7 @@ server {
 
     location ~ \.php\$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/run/php/$php_socket;
+        fastcgi_pass unix:/run/php/\$php_socket;
     }
 
     location ~ /\\.ht {
@@ -119,24 +136,25 @@ for conf in "$NGINX_SITES_AVAILABLE"/*.test; do
   fi
 done
 
-#  Fix permissions
+# 8) Fix permissions
 USER_NAME=$(whoami)
 sudo chown -R "$USER_NAME":www-data "$WEB_ROOT"
 sudo find "$WEB_ROOT" -type d -exec chmod 750 {} \;
 sudo find "$WEB_ROOT" -type f -exec chmod 640 {} \;
-sudo chmod o+x "$HOME"
-sudo chmod o+x "$WEB_ROOT"
+sudo chmod o+x "$HOME" "$WEB_ROOT"
 if ! groups "$USER_NAME" | grep -q '\bwww-data\b'; then
   sudo usermod -a -G www-data "$USER_NAME"
 fi
 
-
-# Reload NGINX
-echo "🔄 Reloading NGINX..."
+# 9) Reload NGINX
 if systemctl is-active --quiet nginx; then
   sudo systemctl reload nginx
 else
   sudo systemctl start nginx
 fi
 
+
 echo "🎉 SSL Manager complete."
+echo "Please restart your terminal or run 'source ~/.zshrc' to apply changes."
+echo "You may need to restart your browser for the new SSL certificate to take effect."
+echo "Also you need to install the certificate on your Windows host. See the README for instructions."
