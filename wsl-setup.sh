@@ -1,5 +1,11 @@
+# Source user configuration
+source ~/.wsl_env
+
 #!/usr/bin/env bash
 set -euo pipefail
+
+# Source user configuration
+source ~/.wsl_env
 
 # -----------------------------------------------------------------------------
 # Main WSL Web‑Dev Installer: clones helper repo, sets up environment & config
@@ -30,7 +36,7 @@ default_dir="$HOME/.wsl_scripts"
 read -rp "Local path for cloned scripts [default: $default_dir]: " SCRIPTS_DIR
 SCRIPTS_DIR=${SCRIPTS_DIR:-"$default_dir"}
 
-# Persist config to env file
+# Persist config for helpers
 cat > ~/.wsl_env <<EOF
 export WEB_ROOT="$WEB_ROOT"
 export SSL_DIR="$SSL_DIR"
@@ -54,25 +60,42 @@ for STEP in $(seq 1 $TOTAL_STEPS); do
   if (( STEP <= LAST_DONE )); then echo "✅ Step $STEP skipped"; continue; fi
   echo -e "\n⏭ Step $STEP of $TOTAL_STEPS"
   case $STEP in
-    1) run_step "System update" sudo apt-get update -qq && sudo apt-get upgrade -qq ;;  
-    2) run_step "Install essentials" sudo apt-get install -y -qq build-essential curl git unzip jq nginx mysql-server redis-server php-redis ;;  
+    1)
+      run_step "System update" bash -c 'sudo apt-get update -qq >"$LOG_FILE" 2>&1 && sudo apt-get upgrade -qq >"$LOG_FILE" 2>&1'
+      ;;
+    2)
+      run_step "Install essentials" bash -c 'sudo apt-get install -y -qq build-essential curl git unzip jq nginx mysql-server redis-server php-redis'
+      ;;
     3)
-       run_step "Install Zsh & Oh My Zsh" bash -c 'sudo apt-get install -y -qq zsh && export RUNZSH=no CHSH=no && sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
-       run_step "Clone Zsh plugins" bash -c 'ZSH_CUSTOM=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}; git clone -q https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions; git clone -q https://github.com/zsh-users/zsh-syntax-highlighting $ZSH_CUSTOM/plugins/zsh-syntax-highlighting; git clone -q https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k'
-       ;;  
-    4) run_step "Install NVM & Node.js" bash -c 'export NVM_DIR=$HOME/.nvm; git clone -q https://github.com/nvm-sh/nvm.git "$NVM_DIR"; . "$NVM_DIR/nvm.sh"; nvm install --lts' ;;  
-    5) run_step "Add PHP PPA & install PHP" bash -c 'sudo add-apt-repository -y ppa:ondrej/php >/dev/null 2>&1 || true; sudo apt-get update -qq; for v in 8.2 8.3 8.4; do sudo apt-get install -y -qq php${v} php${v}-fpm php${v}-cli php${v}-common php${v}-curl php${v}-gd php${v}-mbstring php${v}-xml php${v}-mysql php${v}-opcache php${v}-intl php${v}-zip php${v}-imap php${v}-pgsql php${v}-soap; done' ;;  
-    6) run_step "Secure MySQL root" sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY ''; FLUSH PRIVILEGES;" ;;  
-    7) run_step "Install Composer" bash -c 'php -r "copy(\"https://getcomposer.org/installer\",\"composer-setup.php\");" && php composer-setup.php && sudo mv composer.phar /usr/local/bin/composer' ;;  
-    8) run_step "Clone helper scripts" git clone --depth=1 "$SCRIPTS_REPO" "$SCRIPTS_DIR" ;;  
-    9) run_step "Install SSL Manager script" bash -c 'cp "$SCRIPTS_DIR/ssl-manager.sh" "$SSL_DIR/ssl-manager.sh" && chmod +x "$SSL_DIR/ssl-manager.sh"' ;;  
-   10)
+      run_step "Install Zsh & Oh My Zsh" bash -c 'sudo apt-get install -y -qq zsh && export RUNZSH=no CHSH=no && sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+      run_step "Clone Zsh plugins" bash -c 'ZSH_CUSTOM=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}; git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions; git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting $ZSH_CUSTOM/plugins/zsh-syntax-highlighting; git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k'
+      ;;
+    4)
+      run_step "Install NVM & Node.js" bash -c 'export NVM_DIR=$HOME/.nvm; git clone --depth=1 https://github.com/nvm-sh/nvm.git "$NVM_DIR"; . "$NVM_DIR/nvm.sh"; nvm install --lts'
+      ;;
+    5)
+      run_step "Add PHP PPA & install PHP" bash -c 'sudo add-apt-repository -y ppa:ondrej/php >/dev/null 2>&1 || true; sudo apt-get update -qq; for v in 8.2 8.3 8.4; do sudo apt-get install -y -qq php${v} php${v}-fpm php${v}-cli php${v}-common php${v}-curl php${v}-gd php${v}-mbstring php${v}-xml php${v}-mysql php${v}-opcache php${v}-intl php${v}-zip php${v}-imap php${v}-pgsql php${v}-soap; done'
+      ;;
+    6)
+      run_step "Secure MySQL root" bash -c 'sudo mysql -e "ALTER USER \'root\'@\'localhost\' IDENTIFIED WITH mysql_native_password BY ''; FLUSH PRIVILEGES;"'
+      ;;
+    7)
+      run_step "Install Composer" bash -c 'php -r "copy(\"https://getcomposer.org/installer\",\"composer-setup.php\");" && HASH_EXPECTED="dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6" && php -r "if (hash_file(\"sha384\",\"composer-setup.php\") === \"$HASH_EXPECTED\") echo; else { unlink(\"composer-setup.php\"); exit 1; }" && php composer-setup.php && php -r "unlink(\"composer-setup.php\");" && sudo mv composer.phar /usr/local/bin/composer'
+      ;;
+    8)
+      run_step "Clone helper scripts" bash -c 'git clone --depth=1 "$SCRIPTS_REPO" "$SCRIPTS_DIR"'
+      ;;
+    9)
+      run_step "Install SSL Manager script" bash -c 'cp "$SCRIPTS_DIR/ssl-manager.sh" "$SSL_DIR/ssl-manager.sh" && chmod +x "$SSL_DIR/ssl-manager.sh"'
+      ;;
+    10)
       touch ~/.zshrc
-      run_step "Append zshrc helpers" bash -c 'grep -qxF "# ── Laragon SSL Manager Check" ~/.zshrc || cat "$SCRIPTS_DIR/zshrc-helpers.sh" >> ~/.zshrc'
-      ;;  
+      # ensure zshrc-helpers script exists before appending
+touch "$SCRIPTS_DIR/zshrc-helpers.sh"
+      run_step "Append zshrc helpers" bash -c 'grep -q "# ── Laragon SSL Manager Check" ~/.zshrc || (cat "$SCRIPTS_DIR/zshrc-helpers.sh" >> ~/.zshrc)'
+      ;;
   esac
   echo "$STEP" > "$STATE_FILE"
 done
 
 echo -e "\n🎉 Setup complete! Please restart your shell or run:\n  source ~/.zshrc"
-echo "🔑 Remember to set up your SSH keys and add them to the ssh-agent."
