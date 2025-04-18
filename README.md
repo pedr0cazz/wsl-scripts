@@ -93,6 +93,22 @@ chmod +x ~/.wsl_scripts/*.sh
 
 # 3. Reload your shell
 source ~/.zshrc
+```
+
+> ✨ After installation, your Zsh theme, SSL certificates, Nginx vhosts, and helpers are all configured.
+>
+> 💡 **Bonus:** The SSL & vhosts manager runs automatically every time you open a new shell—no manual command required.
+
+```bash
+# 1. Clone the scripts
+git clone https://github.com/pedr0cazz/wsl-scripts.git ~/.wsl_scripts
+chmod +x ~/.wsl_scripts/*.sh
+
+# 2. Run the installer
+~/.wsl_scripts/wsl-setup.sh
+
+# 3. Reload your shell
+source ~/.zshrc
 ``` 
 
 > ✨ After installation, your Zsh theme, SSL certificates, Nginx vhosts, and helpers are all configured.
@@ -103,12 +119,38 @@ source ~/.zshrc
 
 ### ➕➖ Add or Remove Projects
 
+- **Default root:** Projects are detected under the path you chose during install (default: `~/www`).
+- **Add a new project:** create a new folder under your project root (e.g. `~/www/myapp`). On your next shell launch (or by running the manager manually), vhosts & SSL will be generated automatically.
+- **Remove:** delete the project folder; the script will clean up vhost files and hosts entries.
+
+
 - **Add a new project**: create a folder under `~/www/myapp`. On next terminal startup (or manual run), vhosts & SSL will be generated.
 - **Remove**: delete the project folder; the script will clean up vhost files and hosts entries.
 
 ### 🔄 Regenerate SSL & vhosts
 
 If you add new folders or pull updates, simply run:
+
+```bash
+~/.wsl_scripts/ssl-manager.sh
+```
+
+No need to restart your shell.
+
+### 📚 Laravel Project Example
+
+1. **Create a new Laravel app** under your project root:
+   ```bash
+   cd ~/www            # or your chosen project root
+   composer create-project laravel/laravel blog
+   ```
+2. **Open a new shell** (or wait for auto-run) to let the SSL manager generate `blog.test` vhost and certificates.
+3. **Visit** your app at: https://blog.test
+4. **Set folder permissions** if needed:
+   ```bash
+   cd ~/www/blog\ n  chmod -R 775 storage bootstrap/cache
+   ```
+5. **Enjoy** developing your Laravel application locally over HTTPS!
 
 ```bash
 ~/.wsl_scripts/ssl-manager.sh
