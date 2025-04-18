@@ -45,15 +45,18 @@ LAST_DONE=0
 TOTAL_STEPS=10
 
 # Spinner helper
-tspinner() {
-    local pid=
-    $1 delay=0.1 spinstr='|/-\\'
-    while ps -p "$pid" &>/dev/null; do
-        printf "\r [%c] " "${spinstr:0:1}"
-        spinstr="${spinstr:1}${spinstr:0:1}"
-        sleep "$delay"
-    done
-    printf "\r"
+tspinner(){
+  local pid=$1
+  local delay=0.1
+  local spinstr='|/-\'
+  while ps -p "$pid" &>/dev/null; do
+    printf "
+ [%c] " "${spinstr:0:1}"
+    spinstr="${spinstr:1}${spinstr:0:1}"
+    sleep "$delay"
+  done
+  printf "
+"
 }
 # run_step wrapper
 run_step() {
