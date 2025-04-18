@@ -16,14 +16,19 @@ Transform your fresh WSL2 Ubuntu into a **powerful web‑development environment
 2. 🛠️ [Installation](#installation) ([WSL Docs](https://docs.microsoft.com/windows/wsl))
    - 🖥️ [Installing WSL 2](#installing-wsl-2) ([Install Guide](https://docs.microsoft.com/windows/wsl/install-win10))
    - 🎨 [MesloLGS Nerd Font](#meslolg-nerd-font) ([Font Repo](https://github.com/romkatv/powerlevel10k-media))
-3. ⚡️ [Quick Start](#quick-start) ([GitHub Repo](https://github.com/pedr0cazz/wsl-scripts))
-4. 🧰 [Usage](#usage) ([Usage Guide](https://github.com/pedr0cazz/wsl-scripts#usage))
+3. 🔧 [Prerequisites](#prerequisites)
+   - ⚙️ [Configure Git](#configure-git)
+   - 🚚 [Import Laragon Projects](#import-laragon-projects)
+   - 🔑 [SSH Keys](#ssh-keys)
+4. ⚡️ [Quick Start](#quick-start) ([GitHub Repo](https://github.com/pedr0cazz/wsl-scripts))
+5. 🧰 [Usage](#usage) ([Usage Guide](https://github.com/pedr0cazz/wsl-scripts#usage))
    - ➕➖ [Add or Remove Projects](#add-or-remove-projects)
    - 🔄 [Regenerate SSL & vhosts](#regenerate-ssl--vhosts)
-5. 🔒 [Trusting SSL Certificates](#trusting-ssl-certificates) ([Cert Trust](https://docs.microsoft.com/windows/security/identity-protection/certificate-trust))
-6. 🤝 [Contributing](#contributing) ([Contribute Guide](https://github.com/pedr0cazz/wsl-scripts/blob/main/CONTRIBUTING.md))
-7. ⚖️ [License](#license) ([MIT](https://github.com/pedr0cazz/wsl-scripts/blob/main/LICENSE))
-8. 🙏 [Acknowledgments](#acknowledgments) ([Powerlevel10k](https://github.com/romkatv/powerlevel10k))
+6. 🔒 [Trusting SSL Certificates](#trusting-ssl-certificates) ([Cert Trust](https://docs.microsoft.com/windows/security/identity-protection/certificate-trust))
+7. 🤝 [Contributing](#contributing) ([Contribute Guide](https://github.com/pedr0cazz/wsl-scripts/blob/main/CONTRIBUTING.md))
+8. ⚖️ [License](#license) ([MIT](https://github.com/pedr0cazz/wsl-scripts/blob/main/LICENSE))
+9. 🙏 [Acknowledgments](#acknowledgments) ([Powerlevel10k](https://github.com/romkatv/powerlevel10k-media))
+
 ---
 
 ## 📝 Overview
@@ -43,11 +48,11 @@ Everything runs **quietly**, shows a **progress bar**, and can **resume** if int
 
 ### 🚧 Always Run as Administrator
 
-> 🚨 **IMPORTANT:** 
-> Always launch **Windows Terminal** (or PowerShell) as **Administrator**. 
-> A shortcut can be created by:
-> 1. Right-click desktop → **New → Shortcut** → target `wt.exe`.
-> 2. Name it “WSL Terminal (Admin)”.
+> 🚨 **IMPORTANT:**  
+> Always launch **Windows Terminal** (or PowerShell) as **Administrator**.  
+> A shortcut can be created by:  
+> 1. Right-click desktop → **New → Shortcut** → target `wt.exe`.  
+> 2. Name it “WSL Terminal (Admin)”.  
 > 3. Right-click shortcut → **Properties → Advanced** → **Run as administrator**.
 
 ### 🖥️ Installing WSL 2
@@ -81,6 +86,40 @@ Powerlevel10k requires special glyphs:
 
 ---
 
+## 🔧 Prerequisites
+
+Before running the installer, complete these setup steps:
+
+### ⚙️ Configure Git
+
+Set your global Git username and email for commits:
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+```
+
+### 🚚 Import Laragon Projects
+
+If you have existing projects in Laragon, you can copy them into your WSL project root (`$HOME/www` by default or your chosen `$WEB_ROOT`):
+```bash
+cp -r /mnt/c/laragon/www/* ~/www/
+# or, if you set a custom path:
+cp -r /mnt/c/laragon/www/* "$WEB_ROOT/"
+```
+
+### 🔑 SSH Keys
+
+To use your existing SSH keys from Windows:
+```bash
+mkdir -p ~/.ssh
+cp /mnt/c/Users/<WindowsUser>/.ssh/id_rsa* ~/.ssh/
+chmod 600 ~/.ssh/id_rsa
+chmod 644 ~/.ssh/id_rsa.pub
+ssh-add ~/.ssh/id_rsa
+```
+
+---
+
 ## ⚡️🚀 Quick Start
 
 ```bash
@@ -109,10 +148,6 @@ source ~/.zshrc
 - **Add a new project:** create a new folder under your project root (e.g. `~/www/myapp`). On your next shell launch (or by running the manager manually), vhosts & SSL will be generated automatically.
 - **Remove:** delete the project folder; the script will clean up vhost files and hosts entries.
 
-
-- **Add a new project**: create a folder under `~/www/myapp`. On next terminal startup (or manual run), vhosts & SSL will be generated.
-- **Remove**: delete the project folder; the script will clean up vhost files and hosts entries.
-
 ### 🔄 Regenerate SSL & vhosts
 
 If you add new folders or pull updates, simply run:
@@ -134,11 +169,10 @@ No need to restart your shell.
 3. **Visit** your app at: https://blog.test
 4. **Set folder permissions** if needed:
    ```bash
-   cd ~/www/blog\ n  chmod -R 775 storage bootstrap/cache
+   cd ~/www/blog
+   chmod -R 775 storage bootstrap/cache
    ```
 5. **Enjoy** developing your Laravel application locally over HTTPS!
-
-
 
 ---
 
