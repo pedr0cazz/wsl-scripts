@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Source user configuration
-source ~/.wsl_env
-
 # -----------------------------------------------------------------------------
 # Main WSL Web‑Dev Installer: clones helper repo, sets up environment & config
 # -----------------------------------------------------------------------------
