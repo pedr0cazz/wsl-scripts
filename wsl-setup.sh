@@ -146,7 +146,7 @@ if ((LAST_DONE < 5)); then
     # Append full helpers content from zshrc-helpers.sh (variables loaded via ~/.wsl_env)
     grep -q '# ── Laragon SSL Manager Check' ~/.zshrc || cat "$SCRIPTS_DIR/zshrc-helpers.sh" >>~/.zshrc
     # add typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
-    grep -q 'typeset -g POWERLEVEL9K_INSTANT_PROMPT=off' ~/.zshrc || echo 'typeset -g POWERLEVEL9K_INSTANT_PROMPT=off' >>~/.zshrc
+    #grep -q 'typeset -g POWERLEVEL9K_INSTANT_PROMPT=off' ~/.zshrc || echo 'typeset -g POWERLEVEL9K_INSTANT_PROMPT=off' >>~/.zshrc
     done_step 5
 fi
 
