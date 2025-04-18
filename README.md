@@ -25,6 +25,30 @@ Welcome to **wsl‑scripts**, a collection of helper scripts designed to streaml
 - **WSL 2** on Windows 10/11, running an Ubuntu (or Debian) distribution
 - **Git** installed within WSL
 - Internet connection to fetch packages and clone this repo
+- **Nerd Font** installed on your Windows terminal emulator (Powerlevel10k requires a Powerline-patched font). Fonts must be installed in Windows, not inside WSL. Follow your terminal’s font settings to select the Nerd Font.
+
+---
+
+## Installing a Nerd Font
+
+Powerlevel10k requires the **MesloLGS Nerd Font** patched with Powerline icons. Download and install these four font files in Windows:
+
+1. [MesloLGS NF Regular.ttf](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf)
+2. [MesloLGS NF Bold.ttf](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf)
+3. [MesloLGS NF Italic.ttf](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf)
+4. [MesloLGS NF Bold Italic.ttf](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf)
+
+Steps to install:
+
+1. **Download** the four `.ttf` files from the URLs above.
+2. **Install** each by right‑clicking and choosing **Install for all users** (or **Install**).
+3. **Configure your terminal**:
+   - **Windows Terminal** → Settings → Profiles → your WSL distro → Appearance → set **Font face** to `MesloLGS NF`.
+   - **Legacy Console** → right‑click title bar → Properties → Font → select one of the `MesloLGS NF` variants.
+4. **Restart** your terminal to apply the new font.
+
+For full details, see the Powerlevel10k manual:
+https://github.com/romkatv/powerlevel10k#manual-font-installation
 
 ---
 

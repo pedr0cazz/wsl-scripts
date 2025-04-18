@@ -32,6 +32,8 @@ composer() {
 
 # ── Start ssh-agent if not running ───────────────────────────────────
 if [[ -z "$SSH_AUTH_SOCK" ]]; then
-    eval "$(ssh-agent -s)"
-    ssh-add ~/.ssh/id_rsa
+  eval "$(ssh-agent -s > /dev/null 2>&1)"
+  if [[ -f "$HOME/.ssh/id_rsa" ]]; then
+    ssh-add "$HOME/.ssh/id_rsa" > /dev/null 2>&1
+  fi
 fi
