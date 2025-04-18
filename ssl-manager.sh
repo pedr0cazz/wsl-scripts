@@ -1,13 +1,36 @@
 #!/bin/bash
 set -euo pipefail
 
-# Source user configuration (must define WEB_ROOT and SSL_DIR)
+# Source user configuration
 if [[ -f "$HOME/.wsl_env" ]]; then
   source "$HOME/.wsl_env"
 else
   echo "ERROR: ~/.wsl_env not found. Please run the setup installer first." >&2
   exit 1
 fi
+
+# Validate variables
+: "${WEB_ROOT:?ERROR: WEB_ROOT is not set.}"
+: "${SSL_DIR:?ERROR: SSL_DIR is not set.}"
+
+# ─────────────────────────────────────────────────────────────────
+# Only run if project-folder set has changed since last run
+# ─────────────────────────────────────────────────────────────────
+HASH_FILE="$HOME/.wsl_projects.hash"
+# List only first‑level dirs, sort them, hash the list
+CURRENT_HASH=$(find "$WEB_ROOT" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
+               | sort \
+               | sha256sum \
+               | awk '{print $1}')
+
+if [[ -f "$HASH_FILE" && "$(cat "$HASH_FILE")" == "$CURRENT_HASH" ]]; then
+  echo "🔎 No changes in $WEB_ROOT. Skipping SSL & vhost regeneration."
+  exit 0
+fi
+
+# Save the new state
+echo "$CURRENT_HASH" >"$HASH_FILE"
+echo "🔄 Detected change in projects, running SSL & vhost manager..."
 
 # Validate variables
 if [[ -z "${WEB_ROOT:-}" ]]; then
