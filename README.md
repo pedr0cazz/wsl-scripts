@@ -215,6 +215,13 @@ ssh-add ~/.ssh/id_rsa
 ```
 This enables passwordless Git over SSH inside WSL.
 
+
+### PHP Install another versions command
+
+Replace `8.4` with the desired version:
+```bash
+sudo apt install php8.4 php8.4-fpm php8.4-mysql php8.4-redis php8.4-curl php8.4-zip php8.4-gd php8.4-mbstring php8.4-bcmath php8.4-xml php8.4-soap php8.4-intl
+```
 ---
 
 ## 🤝 Contributing
