@@ -1,158 +1,135 @@
-# WSL Web‑Dev Environment Scripts
+# 🎉 WSL Web‑Dev Environment Scripts
 
-Welcome to **wsl‑scripts**, a collection of helper scripts designed to streamline your web‑development setup on Windows Subsystem for Linux (WSL). With just a single installer, you can:
-
-- Install essential dev packages (build tools, Nginx, MySQL, Redis, PHP, Node.js, Composer, etc.)
-- Configure Zsh with Oh My Zsh, Powerlevel10k theme, and useful plugins
-- Generate and manage local SSL certificates for `*.test` domains
-- Inject shell helpers for automatic SSL renewal, Composer versioning, and SSH agent startup
+![WSL Logo](https://upload.wikimedia.org/wikipedia/commons/1/1e/Windows_Subsystem_for_Linux_Logo.svg)  
+**Tired of manual setup?** This toolkit turns a fresh WSL 2 Ubuntu into a powerhouse web‑dev environment in one go.
 
 ---
 
-## Repository Contents
+## 🚀 Overview
+
+WSL enables you to run Linux on Windows, but configuring PHP, Node.js, Nginx, SSL, and a fancy shell can take hours. **wsl‑scripts** automates:
+
+- 🛠️ **Core tooling**: build-essential, Nginx, MySQL, Redis, PHP 8.x, Node LTS, Composer
+- 🌈 **Fancy shell**: Zsh with Oh My Zsh, Powerlevel10k theme, autosuggestions & syntax highlighting
+- 🔐 **Local SSL**: self‑signed `*.test` certificates + Nginx vhosts
+- 💡 **Smart helpers**: auto SSL-renewal, PHP version selection for Composer, ssh-agent auto‑start
+
+Everything runs quietly with a neat loading bar and can **resume** if interrupted.
+
+---
+
+## 📦 What's Inside?
 
 ```text
 ~/.wsl_scripts/
-├── wsl-setup.sh       # Main installer and orchestrator
-├── ssl-manager.sh     # Generate/manage SSL certs & Nginx vhosts
-└── zshrc-helpers.sh   # Zsh configuration snippets (auto-run SSL manager, composer wrapper, ssh-agent)
+├── wsl-setup.sh       # 🏗️ Installer script
+├── ssl-manager.sh     # 🔐 SSL & Nginx vhost manager
+└── zshrc-helpers.sh   # 🦄 Zsh helper snippets
 ```
 
 ---
 
-## Prerequisites
+## ✅ Prerequisites
 
-- **WSL 2** on Windows 10/11, running an Ubuntu (or Debian) distribution
-- **Git** installed within WSL
-- Internet connection to fetch packages and clone this repo
-- **Nerd Font** installed on your Windows terminal emulator (Powerlevel10k requires a Powerline-patched font). Fonts must be installed in Windows, not inside WSL. Follow your terminal’s font settings to select the Nerd Font.
-
----
-
-## Installing a Nerd Font
-
-Powerlevel10k requires the **MesloLGS Nerd Font** patched with Powerline icons. Download and install these four font files in Windows:
-
-1. [MesloLGS NF Regular.ttf](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf)
-2. [MesloLGS NF Bold.ttf](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf)
-3. [MesloLGS NF Italic.ttf](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf)
-4. [MesloLGS NF Bold Italic.ttf](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf)
-
-Steps to install:
-
-1. **Download** the four `.ttf` files from the URLs above.
-2. **Install** each by right‑clicking and choosing **Install for all users** (or **Install**).
-3. **Configure your terminal**:
-   - **Windows Terminal** → Settings → Profiles → your WSL distro → Appearance → set **Font face** to `MesloLGS NF`.
-   - **Legacy Console** → right‑click title bar → Properties → Font → select one of the `MesloLGS NF` variants.
-4. **Restart** your terminal to apply the new font.
-
-For full details, see the Powerlevel10k manual:
-https://github.com/romkatv/powerlevel10k#manual-font-installation
+1. **Windows 10/11 + WSL 2**: Install Ubuntu or Debian from Microsoft Store.
+2. **Git** in WSL: `sudo apt install git`
+3. **Internet**: Needed to fetch packages and repos.
+4. **MesloLGS Nerd Font**: Required for Powerlevel10k icons—install on **Windows**, not inside WSL.
 
 ---
 
-## Installation & Usage
+## 🎨 Installing the MesloLGS Nerd Font
 
-### 1. Clone the repository
+Powerlevel10k needs special glyphs. Follow these steps on **Windows**:
 
-Choose a directory for your helper scripts (we recommend `~/.wsl_scripts`):
+1. **Download** the four patched fonts:
+   - [MesloLGS NF Regular.ttf](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf)
+   - [MesloLGS NF Bold.ttf](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf)
+   - [MesloLGS NF Italic.ttf](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf)
+   - [MesloLGS NF Bold Italic.ttf](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf)
+2. **Install** each by right‑click → **Install for all users**.
+3. **Select** in your terminal:
+   - **Windows Terminal**: Settings → Profiles → Ubuntu → Appearance → **Font face** → `MesloLGS NF`
+   - **Legacy Console**: Title bar → Properties → **Font** → choose `MesloLGS NF`
+4. **Restart** your terminal.
+
+> **Tip**: Verify inside WSL:
+> ```bash
+> ls /mnt/c/Windows/Fonts/ | grep 'MesloLGS NF'
+> ```
+
+> ✨ _Credit: Powerlevel10k_ – the easiest, most minimal Zsh theme with instant prompt and over 200 icons. See its documentation: https://github.com/romkatv/powerlevel10k
+
+---
+
+## ⚡️ Quick Start
 
 ```bash
+# 1. Clone scripts
 git clone https://github.com/pedr0cazz/wsl-scripts.git ~/.wsl_scripts
 chmod +x ~/.wsl_scripts/*.sh
-```
 
-### 2. Run the main installer
-
-```bash
+# 2. Run installer
 ~/.wsl_scripts/wsl-setup.sh
-```
 
-The script will prompt for:
-
-- **State file path** (default: `~/.wsl_setup_state`) – used to resume if interrupted
-- **Project root** (default: `~/www`) – where your sites live
-- **SSL directory** (default: `~/ssl`) – certificate storage location
-- **Scripts repo URL** (default: this GitHub URL)
-- **Local clone path** (default: `~/.wsl_scripts`)
-
-Then it will perform all setup steps quietly, displaying a loading bar for each.
-
-### 3. Activate your Zsh helpers
-
-After the installer finishes, either **restart your shell** or run:
-
-```bash
+# 3. Activate Zsh helpers
 source ~/.zshrc
 ```
 
-This enables:
-
-- 🛡 **Automatic SSL Manager Check**: detects new or removed project folders and regenerates certs
-- 🚀 **Smart Composer Wrapper**: auto-selects the PHP version per project
-- 🔑 **SSH Agent Auto-Start**: ensures your SSH key is loaded
-
-### 4. Manual SSL Management
-
-If you add a new project folder under your `WEB_ROOT`, the SSL manager will run on the next shell launch. To force a regeneration manually:
-
-```bash
-~/.wsl_scripts/ssl-manager.sh
-```
+During install you’ll choose:
+- State file (resume checkpoint)
+- Project root (default `~/www`)
+- SSL dir (default `~/ssl`)
+- Repo URL & local path
 
 ---
 
-## Installing the Root CA on Windows
+## 🔐 Trusting `*.test` SSL in Windows
 
-To trust `https://*.test` certificates in Windows, import the root CA generated by the script:
-
-1. **Copy the root certificate** into Windows:
+1. Copy the root CA into Windows:
    ```bash
-   cp "$SSL_DIR/ca/rootCA.pem" /mnt/c/Users/<YourWindowsUser>/Desktop/rootCA.pem
+   cp ~/ssl/ca/rootCA.pem /mnt/c/Users/<YourUser>/Desktop/
    ```
-2. **Install into Windows Trusted Root**:
-   - Double-click `rootCA.pem` on your Desktop.
-   - Click **Install Certificate** → choose **Local Machine** → **Next**.
-   - Select **Place all certificates in the following store** → **Trusted Root Certification Authorities** → **Finish**.
-3. **Restart your browser** and visit `https://myapp.test`—you’ll now see a valid lock icon.
+2. Double-click **rootCA.pem** → **Install Certificate** → Local Machine → **Trusted Root Certification Authorities** → Finish.
+3. Restart browser & visit `https://myapp.test` safely.
 
 ---
 
-## Usage Notes
+## 🛠️ Detailed Tutorial for Beginners
 
-- **Project root**: Any folder under your `WEB_ROOT` (default: `~/www`) becomes `folder.test` with HTTPS.
-- **Composer**: Automatically uses the PHP version declared in `composer.json`.
-- **Nginx**: Vhosts created for each project; PHP-FPM socket auto-detected.
-- **MySQL**: Root user secured with an empty password by default (seek to change in production).
-- **Redis**: Installed and running out of the box.
-
----
-
-## Tutorial: Step‑by‑Step Example
-
-1. **Create a new Laravel project**:
+1. **Create a project**:
    ```bash
    mkdir -p ~/www/myapp && cd ~/www/myapp
    composer create-project laravel/laravel .
    ```
-2. **Open a new terminal** → Zsh detects the new folder → runs the SSL manager → vhost+cert created.
-3. **Browse** `https://myapp.test` to see your app securely served.
-4. **Run** `composer` commands to automatically select the correct PHP version.
-5. **Use** `ssh` without manual agent startup.
+2. **New terminal** opens Zsh → SSL manager runs → site configured.
+3. **Browse**: https://myapp.test 🖥️🔒
+4. **Composer**: auto-selects your PHP version.
+5. **SSH**: key loaded automatically.
 
 ---
 
-## Contributing
+## 🤝 Contributing & Support
 
-Pull requests and issues are welcome! To update your clone:
-
+Questions, issues, or pull requests welcome!  
+To update:
 ```bash
 git -C ~/.wsl_scripts pull
-```
+```  
+Reach out via GitHub issues.
 
 ---
 
-## License
+## ⚖️ License
 
-This project is licensed under the MIT License. See [LICENSE](./LICENSE) for details.
+MIT License – see [LICENSE](./LICENSE).
+Feel free to use, modify, and share this toolkit.
+No warranty, but I hope it saves you time!
+---
+
+## 🙏 Acknowledgments
+
+- Thank you to the **Powerlevel10k** team for creating the [Powerlevel10k Zsh theme](https://github.com/romkatv/powerlevel10k), which inspired our shell setup and UX enhancements.
+- Inspired by various community scripts and dotfiles for making WSL a first‑class development environment.
+- Special thanks to contributors and maintainers of open‑source projects this relies on: Ubuntu, Nginx, MySQL, Redis, PHP, Node.js, Composer, Oh My Zsh, and Nerd Fonts authors.
+- Powered by the generous open‑source community — you keep tooling awesome and free!"
