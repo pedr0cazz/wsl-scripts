@@ -43,10 +43,23 @@ export SCRIPTS_DIR="$SCRIPTS_DIR"
 export SSL_SCRIPT="\$SCRIPTS_DIR/ssl-manager.sh"
 EOF
 
-# Quiet runner
-run(){ local msg="$1"; shift; printf "→ %s... " "$msg"; if ! "$@" >/dev/null 2>&1; then echo "✖"; exit 1; else echo "✔"; fi }
+# Quiet runner: shows errors on failure
+run(){
+  local msg="$1"; shift
+  printf "→ %s... " "$msg"
+  local output status
+  # Capture stderr, silence stdout
+  output=$( { "$@" 1>/dev/null; } 2>&1 ) || status=$?
+  if [[ -n "$status" && "$status" -ne 0 ]]; then
+    echo "✖"
+    echo "$output"
+    exit $status
+  else
+    echo "✔"
+  fi
+}
 
-echo
+echo "🔧 Starting WSL Web-Dev Installer v4"
 # Step 1: Create project root
 if (( LAST_DONE < 1 )); then
   run "Create project root at $WEB_ROOT" mkdir -p "$WEB_ROOT"
