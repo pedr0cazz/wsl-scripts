@@ -110,7 +110,10 @@ With these scripts, setting up a fresh WSL 2 instance becomes a single-command 
    ```bash
    source ~/.zshrc
    ```
-
+4. **If you dont like the choosen settings you can rerun the p10k command**
+   ```bash
+   p10k configure
+   ```
 > **Result:** You now have Nginx, PHP-FPM, MySQL, Redis, Node, and Composer configured, plus a fancy Zsh prompt ready to go.
 
 ---
