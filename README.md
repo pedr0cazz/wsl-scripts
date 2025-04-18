@@ -99,20 +99,6 @@ source ~/.zshrc
 >
 > 💡 **Bonus:** The SSL & vhosts manager runs automatically every time you open a new shell—no manual command required.
 
-```bash
-# 1. Clone the scripts
-git clone https://github.com/pedr0cazz/wsl-scripts.git ~/.wsl_scripts
-chmod +x ~/.wsl_scripts/*.sh
-
-# 2. Run the installer
-~/.wsl_scripts/wsl-setup.sh
-
-# 3. Reload your shell
-source ~/.zshrc
-``` 
-
-> ✨ After installation, your Zsh theme, SSL certificates, Nginx vhosts, and helpers are all configured.
-
 ---
 
 ## 🧰 Usage
@@ -152,11 +138,7 @@ No need to restart your shell.
    ```
 5. **Enjoy** developing your Laravel application locally over HTTPS!
 
-```bash
-~/.wsl_scripts/ssl-manager.sh
-```
 
-No need to restart your shell.
 
 ---
 
