@@ -141,7 +141,14 @@ No shell restart needed.
 
 ### 📚 Laravel Project Example
 
-1. Create a Laravel app in the root:
+1. Install and scaffold a new Laravel project using the Laravel installer:
+   ```bash
+   # Install the Laravel installer globally
+   composer global require laravel/installer
+
+   # Scaffold a new project named "blog"
+   cd "$WEB_ROOT"
+   laravel new blog
    ```bash
    cd "$WEB_ROOT"
    composer create-project laravel/laravel blog
