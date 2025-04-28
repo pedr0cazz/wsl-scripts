@@ -93,7 +93,7 @@ With these scripts, setting up a fresh WSL 2 instance becomes a single-command 
 
 ---
 
-## ⚡️ Quick Start
+## ⚡️ Quick Start inside WSL
 
 1. **Clone the repo and make scripts executable**
    ```bash
