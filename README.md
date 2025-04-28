@@ -169,6 +169,9 @@ No shell restart needed.
    ```bash
    sudo chown -R "$USER":"$USER" blog
    chmod -R 775 blog/storage blog/bootstrap/cache
+   cd ~/blog
+   sudo chown -R $USER:www-data storage bootstrap/cache
+   sudo chmod -R 775 storage bootstrap/cache
    ```
 
 ---
