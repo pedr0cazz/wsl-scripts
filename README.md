@@ -236,6 +236,23 @@ sudo apt install php8.4 php8.4-fpm php8.4-mysql php8.4-redis php8.4-curl php8.4-
 ```
 ---
 
+## 🔄 Keep WSL2 Alive (GUI)
+
+Contributed by [**IvoMiranda**](https://github.com/IvoMiranda), the `wsl_nginx_gui.py` script provides a lightweight graphical interface for Windows to prevent WSL2 from shutting down due to inactivity by periodically checking the Nginx service status.
+
+### ⚙️ How it works:
+- Runs a periodic status check of Nginx in WSL2 every few seconds (customizable).
+- Keeps WSL2 active as long as the application window remains open.
+- Displays a timer showing the time since the last check.
+
+### 🚀 Quick Usage:
+1. Ensure Python is installed on your Windows host.
+2. Run the script from Windows:
+   ```powershell
+   python wsl_nginx_gui.py
+   ```
+3. Adjust the interval by modifying the CHECK_INTERVAL_MS variable at the top of the script.
+
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
