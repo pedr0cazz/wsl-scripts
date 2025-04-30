@@ -29,6 +29,7 @@ Transform a clean WSL 2 Ubuntu install into a **full-featured, secure web‑dev
    - ⚙️ [Configure Git](#configure-git)
    - 🚚 [Import Laragon Projects](#import-laragon-projects)
    - 🔑 [SSH Keys](#ssh-keys)
+   - 🖥️ [Keep WSL2 Alive (GUI)](#keep-wsl2-alive) by [**IvoMiranda**](https://github.com/IvoMiranda)
 7. 🤝 [Contributing](#contributing)
 8. ⚖️ [License](#license)
 9. 🙏 [Acknowledgments](#acknowledgments)
